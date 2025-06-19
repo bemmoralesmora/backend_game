@@ -18,7 +18,7 @@ app.use("/partidas", partidaRoutes);
 app.use("/cartas", cartaRoutes);
 app.use("/codigos", codigoRoutes);
 
-const PORT = 5500;
+const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
 });
