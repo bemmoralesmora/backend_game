@@ -1,18 +1,25 @@
-const mysql = require("mysql2");
+const mysql = require("mysql2/promise");
 
-const db = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "coldwinter.123",
-  database: "playgroud",
+const pool = mysql.createPool({
+  host: "bdxffeko8k33g6gukerv-mysql.services.clever-cloud.com",
+  user: "u9we5f5zffprspp0",
+  password: "BKyj7I0WNNsasq5lLvRC",
+  database: "bdxffeko8k33g6gukerv",
+  port: 3306,
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
 });
 
-db.connect((err) => {
-  if (err) {
+// Verificar conexión al iniciar
+pool
+  .getConnection()
+  .then((connection) => {
+    console.log("✅ Conectado a MySQL (Pool)");
+    connection.release();
+  })
+  .catch((err) => {
     console.error("Error al conectar a MySQL:", err.message);
-  } else {
-    console.log("✅ Conectado a MySQL");
-  }
-});
+  });
 
-module.exports = db;
+module.exports = pool;
