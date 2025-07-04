@@ -6,10 +6,11 @@ const jwt = require("jsonwebtoken");
 
 // Configuración de la conexión a la base de datos
 const pool = mysql.createPool({
-  host: "localhost",
-  user: "root",
-  password: "coldwinter.123",
-  database: "playgroud",
+  host: "bdxffeko8k33g6gukerv-mysql.services.clever-cloud.com",
+  user: "u9we5f5zffprspp0",
+  password: "BKyj7I0WNNsasq5lLvRC",
+  database: "bdxffeko8k33g6gukerv",
+  port: 3306,
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
@@ -215,6 +216,7 @@ app.get("/api/partidas/validar/:codigo", async (req, res) => {
 // INICIAR SERVIDOR
 // ------------------------------------------
 const PORT = process.env.PORT || 3000;
+
 app.listen(PORT, () => {
-  console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
+  console.log(`Servidor escuchando en puerto ${PORT}`);
 });
