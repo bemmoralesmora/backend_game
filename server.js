@@ -1,7 +1,10 @@
 const express = require("express");
 const cors = require("cors");
-const authRoutes = require("./routes/authRoutes");
-const partidaRoutes = require("./routes/partidaRoutes");
+const authRoutes = require("./routers/authRoutes"); // Antes: "./routes/authRoutes"
+const partidaRoutes = require("./routers/partidaRoutes");
+const cartaRoutes = require("./routers/cartaRoutes");
+const codigoRoutes = require("./routers/codigoRoutes");
+const userRoutes = require("./routers/userRoutes");
 
 const app = express();
 app.use(cors());
