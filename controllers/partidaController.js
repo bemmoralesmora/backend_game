@@ -80,44 +80,36 @@ exports.validarPartida = async (req, res) => {
     const { codigo } = req.params;
     const [partidas] = await pool.execute(
       `SELECT 
-        id_partidas,
-        nombre_partida,
-        numero_jugadores,
-        numero_nivel,
-        codigo_generado,
+        id_partidas as id,
+        nombre_partida as nombre,
+        numero_jugadores as jugadores,
+        numero_nivel as nivel,
+        codigo_generado as codigo,
         dificultad,
-        tipo_partida,
+        tipo_partida as tipo,
         estado,
-        id_usuarios
+        id_usuarios as creador
       FROM Partidas WHERE codigo_generado = ?`,
       [codigo]
     );
 
     if (partidas.length === 0) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Partida no encontrada" });
+      return res.status(404).json({
+        success: false,
+        message: "Partida no encontrada",
+      });
     }
 
     const partida = partidas[0];
     res.json({
       success: true,
-      partida: {
-        id: partida.id_partidas,
-        nombre: partida.nombre_partida,
-        jugadores: partida.numero_jugadores,
-        nivel: partida.numero_nivel,
-        codigo: partida.codigo_generado,
-        dificultad: partida.dificultad,
-        tipo: partida.tipo_partida,
-        estado: partida.estado,
-        creador: partida.id_usuarios,
-      },
+      partida,
     });
   } catch (error) {
     console.error("Error al validar partida:", error);
-    res
-      .status(500)
-      .json({ success: false, message: "Error interno del servidor" });
+    res.status(500).json({
+      success: false,
+      message: "Error interno del servidor",
+    });
   }
 };
