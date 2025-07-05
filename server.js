@@ -1,18 +1,24 @@
 const express = require("express");
 const cors = require("cors");
-const authRoutes = require("./routers/authRoutes"); // Antes: "./routes/authRoutes"
+const corsConfig = require("./corsConfig");
+
+const authRoutes = require("./routers/authRoutes");
 const partidaRoutes = require("./routers/partidaRoutes");
 const cartaRoutes = require("./routers/cartaRoutes");
 const codigoRoutes = require("./routers/codigoRoutes");
 const userRoutes = require("./routers/userRoutes");
 
 const app = express();
-app.use(cors());
+
+app.use(cors(corsConfig));
+
 app.use(express.json());
 
-// Rutas
-app.use("/auth", authRoutes); // Unifica /register y /login bajo /auth
-app.use("/api/partidas", partidaRoutes); // Coherente con tu index.js
+app.use("/auth", authRoutes);
+app.use("/api/partidas", partidaRoutes);
+app.use("/api/cartas", cartaRoutes);
+app.use("/api/codigos", codigoRoutes);
+app.use("/api/usuarios", userRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

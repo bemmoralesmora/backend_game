@@ -1,22 +1,67 @@
 const pool = require("../db");
 
 exports.crearPartida = async (req, res) => {
-  const { nombre_partida, numero_jugadores, numero_nivel, codigo_generado } =
-    req.body;
+  const {
+    nombre_partida,
+    numero_jugadores,
+    numero_nivel,
+    codigo_generado,
+    dificultad,
+    tipo_partida = "publica",
+    estado = "esperando",
+    id_usuarios = null,
+  } = req.body;
 
+  // Campos obligatorios
   if (
     !nombre_partida ||
     !numero_jugadores ||
     !numero_nivel ||
-    !codigo_generado
+    !codigo_generado ||
+    !dificultad
   ) {
     return res.status(400).json({ error: "Faltan campos obligatorios" });
   }
 
+  // Validar valores de enum
+  const dificultadesValidas = ["facil", "intermedio", "dificil"];
+  const tiposPartidaValidos = ["publica", "privada"];
+  const estadosValidos = ["esperando", "comenzado", "finalizada"];
+
+  if (!dificultadesValidas.includes(dificultad)) {
+    return res.status(400).json({ error: "Dificultad no válida" });
+  }
+
+  if (tipo_partida && !tiposPartidaValidos.includes(tipo_partida)) {
+    return res.status(400).json({ error: "Tipo de partida no válido" });
+  }
+
+  if (estado && !estadosValidos.includes(estado)) {
+    return res.status(400).json({ error: "Estado no válido" });
+  }
+
   try {
     const [result] = await pool.execute(
-      "INSERT INTO Partidas (nombre_partida, numero_jugadores, numero_nivel, codigo_generado) VALUES (?, ?, ?, ?)",
-      [nombre_partida, numero_jugadores, numero_nivel, codigo_generado]
+      `INSERT INTO Partidas (
+        nombre_partida, 
+        numero_jugadores, 
+        numero_nivel, 
+        codigo_generado,
+        dificultad,
+        tipo_partida,
+        estado,
+        id_usuarios
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        nombre_partida,
+        numero_jugadores,
+        numero_nivel,
+        codigo_generado,
+        dificultad,
+        tipo_partida,
+        estado,
+        id_usuarios,
+      ]
     );
 
     res.status(201).json({
