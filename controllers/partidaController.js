@@ -79,7 +79,17 @@ exports.validarPartida = async (req, res) => {
   try {
     const { codigo } = req.params;
     const [partidas] = await pool.execute(
-      "SELECT * FROM Partidas WHERE codigo_generado = ?",
+      `SELECT 
+        id_partidas,
+        nombre_partida,
+        numero_jugadores,
+        numero_nivel,
+        codigo_generado,
+        dificultad,
+        tipo_partida,
+        estado,
+        id_usuarios
+      FROM Partidas WHERE codigo_generado = ?`,
       [codigo]
     );
 
@@ -98,6 +108,10 @@ exports.validarPartida = async (req, res) => {
         jugadores: partida.numero_jugadores,
         nivel: partida.numero_nivel,
         codigo: partida.codigo_generado,
+        dificultad: partida.dificultad,
+        tipo: partida.tipo_partida,
+        estado: partida.estado,
+        creador: partida.id_usuarios,
       },
     });
   } catch (error) {
