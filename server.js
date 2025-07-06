@@ -17,62 +17,20 @@ const server = http.createServer(app);
 // Configuración de Socket.io con CORS
 const io = socketio(server, {
   cors: {
-    origin: corsConfig.origin,
-    methods: corsConfig.methods,
-    allowedHeaders: corsConfig.allowedHeaders,
-    credentials: corsConfig.credentials,
+    origin: corsConfig.origin, // Usa la misma configuración CORS
+    methods: ["GET", "POST"],
+    credentials: true,
   },
-  // Opciones adicionales para producción
-  transports: ["websocket", "polling"],
-  allowUpgrades: true,
-  pingTimeout: 60000,
-  pingInterval: 25000,
 });
 
-app.options("*", cors(corsConfig));
-
-// Aplicar CORS a todas las rutas
 app.use(cors(corsConfig));
 app.use(express.json());
-
-// Middleware para verificar token en rutas protegidas
-app.use((req, res, next) => {
-  if (req.path.startsWith("/auth")) return next();
-
-  const authHeader = req.headers["authorization"];
-  const token = authHeader && authHeader.split(" ")[1];
-
-  if (token) {
-    // Aquí verificarías el token JWT si es necesario
-    next();
-  } else {
-    // Permitir algunas rutas sin autenticación
-    if (req.path === "/api/partidas" && req.method === "POST") {
-      return next();
-    }
-    next();
-  }
-});
 
 app.use("/auth", authRoutes);
 app.use("/api/partidas", partidaRoutes);
 app.use("/api/cartas", cartaRoutes);
 app.use("/api/codigos", codigoRoutes);
 app.use("/api/usuarios", userRoutes);
-
-app.use((err, req, res, next) => {
-  console.error("Error global:", err);
-
-  if (err.name === "UnauthorizedError") {
-    return res.status(401).json({ error: "Token inválido o expirado" });
-  }
-
-  if (err.message === "Not allowed by CORS") {
-    return res.status(403).json({ error: "Origen no permitido" });
-  }
-
-  res.status(500).json({ error: "Error interno del servidor" });
-});
 
 io.on("connection", (socket) => {
   console.log("Nuevo cliente conectado:", socket.id);
