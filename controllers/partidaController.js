@@ -12,50 +12,18 @@ exports.crearPartida = async (req, res) => {
     id_usuarios = null,
   } = req.body;
 
-  // Campos obligatorios
-  if (
-    !nombre_partida ||
-    !numero_jugadores ||
-    !numero_nivel ||
-    !codigo_generado ||
-    !dificultad
-  ) {
-    return res.status(400).json({ error: "Faltan campos obligatorios" });
-  }
-
-  // Validar valores de enum
-  const dificultadesValidas = ["facil", "intermedio", "dificil"];
-  const tiposPartidaValidos = ["publica", "privada"];
-  const estadosValidos = ["esperando", "comenzado", "finalizada"];
-
-  if (!dificultadesValidas.includes(dificultad)) {
-    return res.status(400).json({ error: "Dificultad no válida" });
-  }
-
-  if (tipo_partida && !tiposPartidaValidos.includes(tipo_partida)) {
-    return res.status(400).json({ error: "Tipo de partida no válido" });
-  }
-
-  if (estado && !estadosValidos.includes(estado)) {
-    return res.status(400).json({ error: "Estado no válido" });
-  }
+  console.log("Datos recibidos:", req.body); // Para depuración
 
   try {
     const [result] = await pool.execute(
       `INSERT INTO Partidas (
-        nombre_partida, 
-        numero_jugadores, 
-        numero_nivel, 
-        codigo_generado,
-        dificultad,
-        tipo_partida,
-        estado,
-        id_usuarios
+        nombre_partida, numero_jugadores, numero_nivel, 
+        codigo_generado, dificultad, tipo_partida, estado, id_usuarios
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         nombre_partida,
-        numero_jugadores,
-        numero_nivel,
+        parseInt(numero_jugadores), // Asegurar que es número
+        parseInt(numero_nivel), // Asegurar que es número
         codigo_generado,
         dificultad,
         tipo_partida,
@@ -64,14 +32,20 @@ exports.crearPartida = async (req, res) => {
       ]
     );
 
+    console.log("Resultado de inserción:", result);
+
     res.status(201).json({
       success: true,
-      message: "Partida guardada exitosamente",
+      message: "Partida creada exitosamente",
       id_partida: result.insertId,
     });
   } catch (error) {
-    console.error("Error al guardar partida:", error);
-    res.status(500).json({ error: "Error interno del servidor" });
+    console.error("Error al crear partida:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error al crear partida",
+      error: error.message,
+    });
   }
 };
 
