@@ -1,23 +1,23 @@
 // corsConfig.js
 const allowedOrigins = [
   "http://127.0.0.1:5501",
-  "http://127.0.0.1:5502",
-  "http://localhost:5500",
-  "",
-  "",
+  "http://localhost:3000",
+  "https://tu-frontend-en-render.com",
 ];
 
-const corsConfig = {
+module.exports = {
   origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
+    // Permitir solicitudes sin origen (como apps móviles o curl)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
-      callback(new Error("No permitido por CORS"));
+      callback(new Error("Not allowed by CORS"));
     }
   },
   methods: ["GET", "POST", "PUT", "DELETE"],
-  allowedHeaders: ["Content-Type"],
+  allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
+  optionsSuccessStatus: 200, // Para navegadores antiguos
 };
-
-module.exports = corsConfig;
