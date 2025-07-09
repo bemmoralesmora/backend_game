@@ -105,7 +105,7 @@ io.on("connection", (socket) => {
 
       // Notificar a todos en la partida
       io.to(`partida_${partida.id_partidas}`).emit("actualizar_jugadores", {
-        jugadoresConectados,
+        jugadoresConectados: jugadores.length,
         jugadoresRequeridos: partida.numero_jugadores,
         listaJugadores: jugadores.map((j) => j.nombre_jugador),
         idPartida: partida.id_partidas,
