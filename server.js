@@ -24,6 +24,8 @@ const io = socketio(server, {
 });
 
 app.use(cors(corsConfig));
+app.options("*", cors(corsConfig));
+
 app.use(express.json());
 
 app.use("/auth", authRoutes);
@@ -41,6 +43,8 @@ io.on("connection", (socket) => {
     idLogin,
   });
   socket.on("unirse_partida", async ({ codigoPartida, idLogin }) => {
+    console.log("⚡️ Unirse a partida:", codigoPartida, idLogin);
+
     try {
       // Obtener información del usuario
       const [usuarios] = await pool.execute(

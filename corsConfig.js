@@ -20,7 +20,7 @@ module.exports = {
       callback(new Error("Not allowed by CORS"));
     }
   },
-  methods: ["GET", "POST", "PUT", "DELETE"],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization", "X-User-Id"],
   credentials: true,
   optionsSuccessStatus: 200, // Para navegadores antiguos
