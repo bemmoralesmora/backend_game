@@ -9,6 +9,7 @@ const partidaRoutes = require("./routers/partidaRoutes");
 const cartaRoutes = require("./routers/cartaRoutes");
 const codigoRoutes = require("./routers/codigoRoutes");
 const userRoutes = require("./routers/userRoutes");
+const pool = require("./db");
 
 const app = express();
 const server = http.createServer(app);
