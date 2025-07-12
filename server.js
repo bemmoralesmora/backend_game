@@ -9,12 +9,10 @@ const partidaRoutes = require("./routers/partidaRoutes");
 const cartaRoutes = require("./routers/cartaRoutes");
 const codigoRoutes = require("./routers/codigoRoutes");
 const userRoutes = require("./routers/userRoutes");
-const pool = require("./db"); // Asegúrate de importar tu pool de conexiones
 
 const app = express();
 const server = http.createServer(app);
 
-// Configuración de Socket.io con CORS
 const io = socketio(server, {
   cors: {
     origin: corsConfig.origin,
@@ -109,8 +107,6 @@ io.on("connection", (socket) => {
         nivel: partida.numero_nivel,
         dificultad: partida.dificultad,
       });
-
-      // Aquí ELIMINAMOS la lógica automática de inicio cuando llegan todos los jugadores
     } catch (error) {
       console.error("Error al unirse a partida:", error);
       socket.emit("error_partida", {
@@ -120,10 +116,8 @@ io.on("connection", (socket) => {
     }
   });
 
-  // Nuevo evento para que el creador inicie la partida
   socket.on("comenzar_partida", async ({ idPartida, idLogin }) => {
     try {
-      // Validar que quien intenta iniciar sea el creador
       const [partidas] = await pool.execute(
         "SELECT * FROM Partidas WHERE id_partidas = ? AND id_usuarios = ?",
         [idPartida, idLogin]
@@ -136,16 +130,16 @@ io.on("connection", (socket) => {
         return;
       }
 
-      // Actualizar estado a comenzado
       await pool.execute(
         "UPDATE Partidas SET estado = 'comenzado' WHERE id_partidas = ?",
         [idPartida]
       );
 
-      // Notificar a todos que la partida comenzó
       io.to(`partida_${idPartida}`).emit("partida_comenzada", {
         idPartida,
         mensaje: "La partida ha comenzado",
+        nivel: partidas[0].numero_nivel,
+        dificultad: partidas[0].dificultad,
       });
     } catch (error) {
       console.error("Error al comenzar la partida:", error);
@@ -158,6 +152,7 @@ io.on("connection", (socket) => {
 
   socket.on("disconnect", async () => {
     console.log("Cliente desconectado:", socket.id);
+
     try {
       const [jugador] = await pool.execute(
         "SELECT id_partida FROM Jugadores_Partida WHERE socket_id = ?",
