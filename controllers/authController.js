@@ -60,17 +60,17 @@ exports.login = async (req, res) => {
   try {
     const connection = await pool.getConnection();
     const [results] = await connection.execute(
-      `SELECT r.id_registro, r.nombre, r.correo, l.contraseña 
+      `SELECT r.id_registro, r.nombre, r.correo, l.contraseña, l.id_login 
        FROM Registro r JOIN Login l ON r.id_registro = l.id_registro
        WHERE r.nombre = ? OR r.correo = ?`,
       [nombre, nombre]
     );
-    connection.release();
 
     if (
       results.length === 0 ||
       !bcrypt.compareSync(contraseña, results[0].contraseña)
     ) {
+      connection.release();
       return res.status(401).json({ message: "Credenciales incorrectas" });
     }
 
@@ -80,6 +80,14 @@ exports.login = async (req, res) => {
       "secreto",
       { expiresIn: "1h" }
     );
+
+    // Guardar token en la tabla Login
+    await connection.execute("UPDATE Login SET token = ? WHERE id_login = ?", [
+      token,
+      user.id_login,
+    ]);
+
+    connection.release();
 
     res.json({
       message: "Login exitoso",
