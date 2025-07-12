@@ -17,7 +17,7 @@ const server = http.createServer(app);
 // Configuración de Socket.io con CORS
 const io = socketio(server, {
   cors: {
-    origin: corsConfig.origin, // Usa la misma configuración CORS
+    origin: corsConfig.origin,
     methods: ["GET", "POST"],
     credentials: true,
   },
@@ -41,10 +41,9 @@ io.on("connection", (socket) => {
     console.log("⚡️ Unirse a partida:", codigoPartida, idLogin);
 
     try {
-      // Obtener información del usuario
       const [usuarios] = await pool.execute(
         "SELECT id_login, nombre FROM Login WHERE id_login = ?",
-        [idLogin] //
+        [idLogin]
       );
 
       if (usuarios.length === 0) {
@@ -57,7 +56,6 @@ io.on("connection", (socket) => {
 
       const nombreJugador = usuarios[0].nombre;
 
-      // Verificar la partida
       const [partidas] = await pool.execute(
         "SELECT * FROM Partidas WHERE codigo_generado = ?",
         [codigoPartida]
@@ -70,7 +68,6 @@ io.on("connection", (socket) => {
 
       const partida = partidas[0];
 
-      // Verificar si la partida ya comenzó
       if (partida.estado !== "esperando") {
         socket.emit("error_partida", {
           mensaje:
@@ -81,7 +78,6 @@ io.on("connection", (socket) => {
         return;
       }
 
-      // Verificar si el usuario ya está en la partida
       const [jugadorExistente] = await pool.execute(
         "SELECT * FROM Jugadores_Partida WHERE id_partida = ? AND id_login = ?",
         [partida.id_partidas, idLogin]
@@ -92,24 +88,18 @@ io.on("connection", (socket) => {
         return;
       }
 
-      // Unirse a la sala (room) específica de la partida
       socket.join(`partida_${partida.id_partidas}`);
 
-      // Registrar al jugador en la base de datos
       await pool.execute(
         "INSERT INTO Jugadores_Partida (id_partida, id_login, nombre_jugador, socket_id) VALUES (?, ?, ?, ?)",
         [partida.id_partidas, idLogin, nombreJugador, socket.id]
       );
 
-      // Obtener lista completa de jugadores conectados
       const [jugadores] = await pool.execute(
         "SELECT nombre_jugador FROM Jugadores_Partida WHERE id_partida = ?",
         [partida.id_partidas]
       );
 
-      const jugadoresConectados = jugadores.length;
-
-      // Notificar a todos en la partida
       io.to(`partida_${partida.id_partidas}`).emit("actualizar_jugadores", {
         jugadoresConectados: jugadores.length,
         jugadoresRequeridos: partida.numero_jugadores,
@@ -120,21 +110,7 @@ io.on("connection", (socket) => {
         dificultad: partida.dificultad,
       });
 
-      // Verificar si se completó el número de jugadores
-      if (jugadoresConectados >= partida.numero_jugadores) {
-        io.to(`partida_${partida.id_partidas}`).emit("partida_lista", {
-          idPartida: partida.id_partidas,
-          nivel: partida.numero_nivel,
-          dificultad: partida.dificultad,
-          jugadores: jugadores.map((j) => j.nombre_jugador),
-        });
-
-        // Actualizar estado de la partida
-        await pool.execute(
-          "UPDATE Partidas SET estado = 'comenzado' WHERE id_partidas = ?",
-          [partida.id_partidas]
-        );
-      }
+      // Aquí ELIMINAMOS la lógica automática de inicio cuando llegan todos los jugadores
     } catch (error) {
       console.error("Error al unirse a partida:", error);
       socket.emit("error_partida", {
@@ -144,11 +120,45 @@ io.on("connection", (socket) => {
     }
   });
 
-  // Manejar desconexión
+  // Nuevo evento para que el creador inicie la partida
+  socket.on("comenzar_partida", async ({ idPartida, idLogin }) => {
+    try {
+      // Validar que quien intenta iniciar sea el creador
+      const [partidas] = await pool.execute(
+        "SELECT * FROM Partidas WHERE id_partidas = ? AND id_usuarios = ?",
+        [idPartida, idLogin]
+      );
+
+      if (partidas.length === 0) {
+        socket.emit("error_partida", {
+          mensaje: "No tienes permiso para iniciar esta partida",
+        });
+        return;
+      }
+
+      // Actualizar estado a comenzado
+      await pool.execute(
+        "UPDATE Partidas SET estado = 'comenzado' WHERE id_partidas = ?",
+        [idPartida]
+      );
+
+      // Notificar a todos que la partida comenzó
+      io.to(`partida_${idPartida}`).emit("partida_comenzada", {
+        idPartida,
+        mensaje: "La partida ha comenzado",
+      });
+    } catch (error) {
+      console.error("Error al comenzar la partida:", error);
+      socket.emit("error_partida", {
+        mensaje: "Error al intentar comenzar la partida",
+        codigo: "INTERNAL_ERROR",
+      });
+    }
+  });
+
   socket.on("disconnect", async () => {
     console.log("Cliente desconectado:", socket.id);
     try {
-      // Obtener información de la partida antes de eliminar al jugador
       const [jugador] = await pool.execute(
         "SELECT id_partida FROM Jugadores_Partida WHERE socket_id = ?",
         [socket.id]
@@ -157,13 +167,11 @@ io.on("connection", (socket) => {
       if (jugador.length > 0) {
         const idPartida = jugador[0].id_partida;
 
-        // Eliminar jugador de la partida
         await pool.execute(
           "DELETE FROM Jugadores_Partida WHERE socket_id = ?",
           [socket.id]
         );
 
-        // Notificar a los demás jugadores
         const [jugadoresRestantes] = await pool.execute(
           "SELECT nombre_jugador FROM Jugadores_Partida WHERE id_partida = ?",
           [idPartida]
