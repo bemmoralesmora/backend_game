@@ -35,11 +35,7 @@ app.use("/api/codigos", codigoRoutes);
 app.use("/api/usuarios", userRoutes);
 
 io.on("connection", (socket) => {
-  console.log("Nuevo cliente conectado:", socket.id);
-
   socket.on("unirse_partida", async ({ codigoPartida, idLogin }) => {
-    console.log("⚡️ Unirse a partida:", codigoPartida, idLogin);
-
     try {
       // Obtener información del usuario
       const [usuarios] = await pool.execute(
