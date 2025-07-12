@@ -36,12 +36,16 @@ io.on("connection", (socket) => {
   console.log("Nuevo cliente conectado:", socket.id);
 
   // Unirse a una sala de partida
+  console.log("Datos recibidos para unirse_partida:", {
+    codigoPartida,
+    idLogin,
+  });
   socket.on("unirse_partida", async ({ codigoPartida, idLogin }) => {
     try {
       // Obtener información del usuario
       const [usuarios] = await pool.execute(
         "SELECT id_login, nombre FROM Login WHERE id_login = ?",
-        [idUsuario]
+        [idLogin] //
       );
 
       if (usuarios.length === 0) {
