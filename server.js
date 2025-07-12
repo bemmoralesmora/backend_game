@@ -40,12 +40,15 @@ io.on("connection", (socket) => {
     try {
       // Obtener información del usuario
       const [usuarios] = await pool.execute(
-        "SELECT nombre FROM Login WHERE id_login = ?",
-        [idLogin]
+        "SELECT id_login, nombre FROM Login WHERE id_login = ?",
+        [idUsuario]
       );
 
       if (usuarios.length === 0) {
-        socket.emit("error_partida", { mensaje: "Usuario no encontrado" });
+        socket.emit("error_partida", {
+          mensaje: "Usuario no encontrado",
+          codigo: "USER_NOT_FOUND",
+        });
         return;
       }
 
@@ -131,7 +134,10 @@ io.on("connection", (socket) => {
       }
     } catch (error) {
       console.error("Error al unirse a partida:", error);
-      socket.emit("error_partida", { mensaje: "Error interno del servidor" });
+      socket.emit("error_partida", {
+        mensaje: "Error interno del servidor",
+        codigo: "INTERNAL_ERROR",
+      });
     }
   });
 

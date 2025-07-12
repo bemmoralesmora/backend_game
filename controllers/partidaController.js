@@ -52,6 +52,28 @@ exports.crearPartida = async (req, res) => {
 exports.validarPartida = async (req, res) => {
   try {
     const { codigo } = req.params;
+    const token = req.headers.authorization?.split(" ")[1];
+
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        message: "Token de autenticación requerido",
+      });
+    }
+
+    // Verificar el token y obtener el usuario
+    const [user] = await pool.execute(
+      "SELECT id_login FROM Login WHERE token = ?",
+      [token]
+    );
+
+    if (user.length === 0) {
+      return res.status(401).json({
+        success: false,
+        message: "Usuario no autenticado",
+      });
+    }
+
     const [partidas] = await pool.execute(
       `SELECT 
         id_partidas as id,
@@ -78,6 +100,7 @@ exports.validarPartida = async (req, res) => {
     res.json({
       success: true,
       partida,
+      userId: user[0].id_login, // Incluir el ID del usuario en la respuesta
     });
   } catch (error) {
     console.error("Error al validar partida:", error);
