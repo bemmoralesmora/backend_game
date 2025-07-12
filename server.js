@@ -37,11 +37,6 @@ app.use("/api/usuarios", userRoutes);
 io.on("connection", (socket) => {
   console.log("Nuevo cliente conectado:", socket.id);
 
-  // Unirse a una sala de partida
-  console.log("Datos recibidos para unirse_partida:", {
-    codigoPartida,
-    idLogin,
-  });
   socket.on("unirse_partida", async ({ codigoPartida, idLogin }) => {
     console.log("⚡️ Unirse a partida:", codigoPartida, idLogin);
 
