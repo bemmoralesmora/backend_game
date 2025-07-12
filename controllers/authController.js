@@ -60,7 +60,7 @@ exports.login = async (req, res) => {
   try {
     const connection = await pool.getConnection();
     const [results] = await connection.execute(
-      `SELECT r.id_registro, r.nombre, r.correo, l.contraseña, l.id_login 
+      `SELECT r.id_registro, r.nombre, r.correo, l.id_login, l.contraseña 
        FROM Registro r JOIN Login l ON r.id_registro = l.id_registro
        WHERE r.nombre = ? OR r.correo = ?`,
       [nombre, nombre]
@@ -81,8 +81,8 @@ exports.login = async (req, res) => {
       { expiresIn: "1h" }
     );
 
-    // Guardar token en la tabla Login
-    await connection.execute("UPDATE Login SET token = ? WHERE id_login = ?", [
+    // ✅ Aquí guardamos el token en la BD
+    await connection.execute(`UPDATE Login SET token = ? WHERE id_login = ?`, [
       token,
       user.id_login,
     ]);
