@@ -141,17 +141,22 @@ io.on("connection", (socket) => {
 
   socket.on("comenzar_partida", async ({ idPartida, idLogin }) => {
     try {
+      console.log("🎮 Petición para comenzar partida:", { idPartida, idLogin });
+
       const [partidas] = await pool.execute(
         "SELECT * FROM Partidas WHERE id_partidas = ? AND id_usuarios = ?",
         [idPartida, idLogin]
       );
 
-      /* if (partidas.length === 0) {
+      if (partidas.length === 0) {
         socket.emit("error_partida", {
           mensaje: "No tienes permiso para iniciar esta partida",
+          codigo: "FORBIDDEN",
         });
         return;
-      } */
+      }
+
+      const partida = partidas[0]; // ✅ Ahora sí es seguro
 
       await pool.execute(
         "UPDATE Partidas SET estado = 'comenzado' WHERE id_partidas = ?",
@@ -161,11 +166,13 @@ io.on("connection", (socket) => {
       io.to(`partida_${idPartida}`).emit("partida_comenzada", {
         idPartida,
         mensaje: "La partida ha comenzado",
-        nivel: partidas[0].numero_nivel,
-        dificultad: partidas[0].dificultad,
+        nivel: partida.numero_nivel,
+        dificultad: partida.dificultad,
       });
+
+      console.log("✅ Partida comenzada:", partida);
     } catch (error) {
-      console.error("Error al comenzar la partida:", error);
+      console.error("❌ Error al comenzar la partida:", error);
       socket.emit("error_partida", {
         mensaje: "Error al intentar comenzar la partida",
         codigo: "INTERNAL_ERROR",
