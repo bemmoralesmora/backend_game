@@ -7,6 +7,7 @@ const allowedOrigins = [
   "http://localhost:3000",
   "https://samuelsarazua.github.io",
   "https://samuelsarazua.github.io/Puzzle_Playground/",
+  "https://puzzle-playground.vercel.app/",
 ];
 
 module.exports = {

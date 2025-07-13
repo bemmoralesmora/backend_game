@@ -156,7 +156,7 @@ io.on("connection", (socket) => {
         return;
       }
 
-      const partida = partidas[0]; // ✅ Ahora sí es seguro
+      const partida = partidas[0];
 
       await pool.execute(
         "UPDATE Partidas SET estado = 'comenzado' WHERE id_partidas = ?",
