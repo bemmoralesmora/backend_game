@@ -83,7 +83,29 @@ io.on("connection", (socket) => {
       );
 
       if (jugadorExistente.length > 0) {
-        socket.emit("error_partida", { mensaje: "Ya estás en esta partida" });
+        // Actualizar socket_id si el jugador ya existe
+        await pool.execute(
+          "UPDATE Jugadores_Partida SET socket_id = ? WHERE id_partida = ? AND id_login = ?",
+          [socket.id, partida.id_partidas, idLogin]
+        );
+        socket.join(`partida_${partida.id_partidas}`);
+
+        // Emitir actualización como siempre
+        const [jugadores] = await pool.execute(
+          "SELECT nombre_jugador FROM Jugadores_Partida WHERE id_partida = ?",
+          [partida.id_partidas]
+        );
+
+        io.to(`partida_${partida.id_partidas}`).emit("actualizar_jugadores", {
+          jugadoresConectados: jugadores.length,
+          jugadoresRequeridos: partida.numero_jugadores,
+          listaJugadores: jugadores.map((j) => j.nombre_jugador),
+          idPartida: partida.id_partidas,
+          nombrePartida: partida.nombre_partida,
+          nivel: partida.numero_nivel,
+          dificultad: partida.dificultad,
+        });
+
         return;
       }
 
