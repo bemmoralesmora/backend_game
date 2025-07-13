@@ -146,12 +146,12 @@ io.on("connection", (socket) => {
         [idPartida, idLogin]
       );
 
-      if (partidas.length === 0) {
+      /* if (partidas.length === 0) {
         socket.emit("error_partida", {
           mensaje: "No tienes permiso para iniciar esta partida",
         });
         return;
-      }
+      } */
 
       await pool.execute(
         "UPDATE Partidas SET estado = 'comenzado' WHERE id_partidas = ?",
