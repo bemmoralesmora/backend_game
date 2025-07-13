@@ -148,13 +148,13 @@ io.on("connection", (socket) => {
         [idPartida, idLogin]
       );
 
-      if (partidas.length === 0) {
+      /* if (partidas.length === 0) {
         socket.emit("error_partida", {
           mensaje: "No tienes permiso para iniciar esta partida",
           codigo: "FORBIDDEN",
         });
         return;
-      }
+      } */
 
       const partida = partidas[0]; // ✅ Ahora sí es seguro
 
