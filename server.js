@@ -16,7 +16,17 @@ const server = http.createServer(app);
 
 const io = socketio(server, {
   cors: {
-    origin: corsConfig.origin,
+    origin: [
+      "http://127.0.0.1:5500",
+      "http://127.0.0.1:5501",
+      "http://127.0.0.1:5502",
+      "http://localhost:3000",
+      "https://samuelsarazua.github.io",
+      "https://samuelsarazua.github.io/Puzzle_Playground",
+      "https://samuelsarazua.github.io/Puzzle_Playground/",
+      "https://puzzle-playground.vercel.app",
+      "https://puzzle-playground.vercel.app/",
+    ],
     methods: ["GET", "POST"],
     credentials: true,
   },

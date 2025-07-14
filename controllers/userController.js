@@ -1,4 +1,4 @@
-const db = require("../db");
+const pool = require("../db");
 
 exports.getUsuario = (req, res) => {
   const { id } = req.params;
@@ -20,7 +20,7 @@ exports.getUsuario = (req, res) => {
     WHERE ul.id_login = ?
   `;
 
-  db.query(queryPerfil, [id], (err, results) => {
+  pool.query(queryPerfil, [id], (err, results) => {
     if (err) return res.status(500).json({ error: err.message });
     if (results.length === 0)
       return res.status(404).json({ message: "Usuario no encontrado" });
@@ -44,7 +44,7 @@ exports.getEstadisticas = (req, res) => {
     WHERE ul.id_login = ?
   `;
 
-  db.query(query, [id_usuario], (err, results) => {
+  pool.query(query, [id_usuario], (err, results) => {
     if (err) return res.status(500).json({ error: err.message });
     if (results.length === 0)
       return res.status(404).json({ message: "Estadísticas no encontradas" });
@@ -68,7 +68,7 @@ exports.getLogros = (req, res) => {
     ORDER BY fecha_obtenido DESC
   `;
 
-  db.query(query, [id], (err, results) => {
+  pool.query(query, [id], (err, results) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json(results); // puede devolver lista vacía si no hay logros
   });
@@ -93,7 +93,7 @@ exports.getPartidas = (req, res) => {
     LIMIT 10
   `;
 
-  db.query(query, [id], (err, results) => {
+  pool.query(query, [id], (err, results) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json(results);
   });
