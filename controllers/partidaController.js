@@ -10,6 +10,7 @@ exports.crearPartida = async (req, res) => {
     tipo_partida = "publica",
     estado = "esperando",
     id_usuarios = null,
+    nombre_juego,
   } = req.body;
 
   console.log("Datos recibidos:", req.body); // Para depuración
