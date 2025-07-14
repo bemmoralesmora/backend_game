@@ -80,7 +80,7 @@ exports.getPartidas = (req, res) => {
 
   const query = `
     SELECT 
-      id_partida,
+      id_partidas,
       nombre_partida,
       numero_jugadores,
       numero_nivel,
