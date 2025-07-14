@@ -89,7 +89,7 @@ exports.getPartidas = (req, res) => {
       estado
     FROM Partidas
     WHERE id_usuarios = ?
-    ORDER BY id_partida DESC
+    ORDER BY id_partidas DESC
     LIMIT 10
   `;
 
