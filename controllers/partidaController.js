@@ -20,7 +20,7 @@ exports.crearPartida = async (req, res) => {
       `INSERT INTO Partidas (
         nombre_partida, numero_jugadores, numero_nivel, 
         codigo_generado, dificultad, tipo_partida, estado, id_usuarios
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         nombre_partida,
         parseInt(numero_jugadores), // Asegurar que es número
