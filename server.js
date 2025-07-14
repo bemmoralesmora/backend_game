@@ -2,7 +2,7 @@ const express = require("express");
 const http = require("http");
 const cors = require("cors");
 const socketio = require("socket.io");
-const { allowedOrigins, corsOptions } = require("./corsConfig");
+const corsConfig = require("./corsConfig");
 
 const authRoutes = require("./routers/authRoutes");
 const partidaRoutes = require("./routers/partidaRoutes");
@@ -16,14 +16,14 @@ const server = http.createServer(app);
 
 const io = socketio(server, {
   cors: {
-    origin: allowedOrigins,
+    origin: corsConfig.origin,
     methods: ["GET", "POST"],
     credentials: true,
   },
 });
 
-app.use(cors(corsOptions));
-app.options("*", cors(corsOptions));
+app.use(cors(corsConfig));
+app.options("*", cors(corsConfig));
 
 app.use(express.json());
 
