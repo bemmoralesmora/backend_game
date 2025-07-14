@@ -6,6 +6,7 @@ const allowedOrigins = [
   "https://samuelsarazua.github.io",
   "https://samuelsarazua.github.io/Puzzle_Playground",
   "https://puzzle-playground.vercel.app",
+  "https://puzzle-playground.vercel.app/",
 ];
 
 const corsOptions = {
