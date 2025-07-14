@@ -19,7 +19,7 @@ app.options("*", cors(corsOptions));
 
 const io = socketio(server, {
   cors: {
-    origin: allowedOrigins,
+    origin: corsOptions,
     methods: ["GET", "POST"],
     credentials: true,
   },
