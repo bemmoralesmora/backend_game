@@ -1,4 +1,3 @@
-// corsConfig.js
 const allowedOrigins = [
   "http://127.0.0.1:5500",
   "http://127.0.0.1:5501",
@@ -6,18 +5,13 @@ const allowedOrigins = [
   "http://localhost:3000",
   "https://samuelsarazua.github.io",
   "https://samuelsarazua.github.io/Puzzle_Playground",
-  "https://samuelsarazua.github.io/Puzzle_Playground/",
   "https://puzzle-playground.vercel.app",
-  "https://puzzle-playground.vercel.app/",
 ];
 
-module.exports = {
+const corsOptions = {
   origin: function (origin, callback) {
     console.log("🌐 Origin recibido:", origin);
-
-    if (!origin) return callback(null, true);
-
-    if (allowedOrigins.includes(origin)) {
+    if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
       console.error("❌ Origin no permitido:", origin);
@@ -28,4 +22,9 @@ module.exports = {
   allowedHeaders: ["Content-Type", "Authorization", "X-User-Id"],
   credentials: true,
   optionsSuccessStatus: 200,
+};
+
+module.exports = {
+  corsOptions,
+  allowedOrigins,
 };
