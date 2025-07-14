@@ -10,22 +10,11 @@ const allowedOrigins = [
 ];
 
 const corsOptions = {
-  origin: function (origin, callback) {
-    console.log("🌐 Origin recibido:", origin);
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      console.error("❌ Origin no permitido:", origin);
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
+  origin: allowedOrigins,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization", "X-User-Id"],
   credentials: true,
   optionsSuccessStatus: 200,
 };
 
-module.exports = {
-  corsOptions,
-  allowedOrigins,
-};
+module.exports = corsOptions;

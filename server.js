@@ -2,7 +2,7 @@ const express = require("express");
 const http = require("http");
 const cors = require("cors");
 const socketio = require("socket.io");
-const { corsOptions, allowedOrigins } = require("./corsConfig");
+const corsOptions = require("./corsConfig"); // Ya no destructures
 
 const authRoutes = require("./routers/authRoutes");
 const partidaRoutes = require("./routers/partidaRoutes");
