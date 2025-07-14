@@ -2,7 +2,7 @@ const express = require("express");
 const http = require("http");
 const cors = require("cors");
 const socketio = require("socket.io");
-const corsConfig = require("./corsConfig");
+const { allowedOrigins, corsOptions } = require("./corsConfig");
 
 const authRoutes = require("./routers/authRoutes");
 const partidaRoutes = require("./routers/partidaRoutes");
@@ -16,24 +16,14 @@ const server = http.createServer(app);
 
 const io = socketio(server, {
   cors: {
-    origin: [
-      "http://127.0.0.1:5500",
-      "http://127.0.0.1:5501",
-      "http://127.0.0.1:5502",
-      "http://localhost:3000",
-      "https://samuelsarazua.github.io",
-      "https://samuelsarazua.github.io/Puzzle_Playground",
-      "https://samuelsarazua.github.io/Puzzle_Playground/",
-      "https://puzzle-playground.vercel.app",
-      "https://puzzle-playground.vercel.app/",
-    ],
+    origin: allowedOrigins,
     methods: ["GET", "POST"],
     credentials: true,
   },
 });
 
-app.use(cors(corsConfig));
-app.options("*", cors(corsConfig));
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 
 app.use(express.json());
 

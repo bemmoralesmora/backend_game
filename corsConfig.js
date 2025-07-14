@@ -11,7 +11,7 @@ const allowedOrigins = [
   "https://puzzle-playground.vercel.app/",
 ];
 
-module.exports = {
+const corsOptions = {
   origin: function (origin, callback) {
     console.log("🌐 Origin recibido:", origin);
 
@@ -28,4 +28,9 @@ module.exports = {
   allowedHeaders: ["Content-Type", "Authorization", "X-User-Id"],
   credentials: true,
   optionsSuccessStatus: 200,
+};
+
+module.exports = {
+  allowedOrigins,
+  corsOptions,
 };
