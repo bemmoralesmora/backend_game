@@ -29,6 +29,7 @@ exports.crearPartida = async (req, res) => {
         tipo_partida,
         estado,
         id_usuarios,
+        nombre_juego,
       ]
     );
 
@@ -84,7 +85,8 @@ exports.validarPartida = async (req, res) => {
         dificultad,
         tipo_partida as tipo,
         estado,
-        id_usuarios as creador
+        id_usuarios as creador,
+        nombre_juego
       FROM Partidas WHERE codigo_generado = ?`,
       [codigo]
     );

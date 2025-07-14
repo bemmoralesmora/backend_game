@@ -168,6 +168,7 @@ io.on("connection", (socket) => {
         mensaje: "La partida ha comenzado",
         nivel: partida.numero_nivel,
         dificultad: partida.dificultad,
+        nombre_juego: partida.nombre_juego,
       });
 
       console.log("✅ Partida comenzada:", partida);
