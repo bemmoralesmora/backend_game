@@ -19,7 +19,7 @@ exports.crearPartida = async (req, res) => {
     const [result] = await pool.execute(
       `INSERT INTO Partidas (
         nombre_partida, numero_jugadores, numero_nivel, 
-        codigo_generado, dificultad, tipo_partida, estado, id_usuarios
+        codigo_generado, dificultad, tipo_partida, estado, id_usuarios, nombre_juego
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         nombre_partida,
