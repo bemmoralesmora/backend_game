@@ -118,7 +118,30 @@ exports.guardarResultado = async (req, res) => {
   const { id_partida, id_login, puntos_obtenidos } = req.body;
 
   try {
-    const [resultado] = await pool.execute(
+    // Verificar si ya existe un resultado para este jugador en esta partida
+    const [existe] = await pool.execute(
+      `SELECT id_resultado FROM ResultadosPartida
+       WHERE id_partida = ? AND id_login = ?`,
+      [id_partida, id_login]
+    );
+
+    if (existe.length > 0) {
+      // Si ya existe, actualiza los puntos
+      await pool.execute(
+        `UPDATE ResultadosPartida
+         SET puntos_obtenidos = ?
+         WHERE id_partida = ? AND id_login = ?`,
+        [puntos_obtenidos, id_partida, id_login]
+      );
+
+      return res.status(200).json({
+        success: true,
+        message: "Puntos actualizados correctamente",
+      });
+    }
+
+    // Si no existe, inserta nuevo
+    await pool.execute(
       `INSERT INTO ResultadosPartida (id_partida, id_login, puntos_obtenidos)
        VALUES (?, ?, ?)`,
       [id_partida, id_login, puntos_obtenidos]
