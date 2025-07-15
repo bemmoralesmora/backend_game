@@ -109,6 +109,39 @@ io.on("connection", (socket) => {
         return;
       }
 
+      socket.on(
+        "finalizar_partida",
+        async ({ id_partida, id_login, puntos_obtenidos, correctas }) => {
+          try {
+            // Guarda resultado
+            await pool.execute(
+              "INSERT INTO ResultadosPartida (id_partida, id_login, puntos_obtenidos, correctas) VALUES (?, ?, ?, ?)",
+              [id_partida, id_login, puntos_obtenidos, correctas]
+            );
+
+            // Obtener nuevo podio
+            const [resultados] = await pool.execute(
+              `SELECT L.nombre, R.puntos_obtenidos, R.correctas
+             FROM ResultadosPartida R
+             JOIN Login L ON R.id_login = L.id_login
+             WHERE R.id_partida = ?
+             ORDER BY R.puntos_obtenidos DESC
+             LIMIT 5`,
+              [id_partida]
+            );
+
+            // Emitir actualización del podio a todos los jugadores de la partida
+            io.to(`partida_${id_partida}`).emit("actualizar_podio", resultados);
+          } catch (error) {
+            console.error("❌ Error al finalizar partida:", error);
+            socket.emit("error_partida", {
+              mensaje: "No se pudo guardar el resultado",
+              codigo: "FINALIZAR_ERROR",
+            });
+          }
+        }
+      );
+
       socket.join(`partida_${partida.id_partidas}`);
 
       await pool.execute(
