@@ -3,11 +3,11 @@ const pool = require("../db");
 exports.getUsuario = (req, res) => {
   const { id } = req.params;
 
-  // Obtener datos básicos del perfil
   const queryPerfil = `
     SELECT 
-      ul.id_login AS id,
-      ul.nombre,
+      l.id_login AS id,
+      l.nombre AS nombre_login,
+      ul.nombre AS nombre_perfil,
       ul.descripcion,
       ul.seguidores,
       ul.imagen_perfil,
@@ -15,13 +15,15 @@ exports.getUsuario = (req, res) => {
       e.victorias,
       e.derrotas,
       e.total_partidas
-    FROM UsuariosLogin ul
+    FROM Login l
+    LEFT JOIN UsuariosLogin ul ON l.id_login = ul.id_login
     LEFT JOIN Estadisticas e ON ul.id_estadisticas = e.id_estadisticas
-    WHERE ul.id_login = ?
+    WHERE l.id_login = ?
   `;
 
   pool.query(queryPerfil, [id], (err, results) => {
     if (err) return res.status(500).json({ error: err.message });
+
     if (results.length === 0)
       return res.status(404).json({ message: "Usuario no encontrado" });
 
