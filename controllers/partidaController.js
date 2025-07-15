@@ -165,24 +165,30 @@ exports.obtenerPodio = async (req, res) => {
   }
 };
 
-exports.obtenerTodosLosResultados = async (req, res) => {
+exports.obtenerResultadosPorPartida = async (req, res) => {
+  const { id } = req.params; // id_partida recibido como parámetro
+
   try {
-    const [resultados] = await pool.execute(`
+    const [resultados] = await pool.execute(
+      `
       SELECT r.*, l.nombre 
       FROM ResultadosPartida r
       JOIN Login l ON r.id_login = l.id_login
+      WHERE r.id_partida = ?
       ORDER BY r.puntos_obtenidos DESC
-    `);
+      `,
+      [id]
+    );
 
     res.json({
       success: true,
       resultados,
     });
   } catch (error) {
-    console.error("Error al obtener todos los resultados:", error);
+    console.error("Error al obtener resultados por partida:", error);
     res.status(500).json({
       success: false,
-      message: "Error al obtener resultados",
+      message: "Error al obtener resultados de la partida",
     });
   }
 };

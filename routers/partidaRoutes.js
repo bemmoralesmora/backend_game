@@ -5,13 +5,13 @@ const {
   validarPartida,
   guardarResultado,
   obtenerPodio,
-  obtenerTodosLosResultados,
+  obtenerResultadosPorPartida,
 } = require("../controllers/partidaController");
 
 router.post("/", crearPartida);
 router.get("/validar/:codigo", validarPartida);
 router.post("/guardar-resultado", guardarResultado); // Nueva ruta
 router.get("/podio/:id_partida", obtenerPodio); // Nueva ruta
-router.get("/resultados", obtenerTodosLosResultados); // <-- esta ruta nueva
+router.get("/resultados/:id", obtenerResultadosPorPartida);
 
 module.exports = router;
