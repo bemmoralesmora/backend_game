@@ -113,3 +113,54 @@ exports.validarPartida = async (req, res) => {
     });
   }
 };
+
+exports.guardarResultado = async (req, res) => {
+  const { id_partida, id_login, puntos_obtenidos } = req.body;
+
+  try {
+    const [resultado] = await pool.execute(
+      `INSERT INTO ResultadosPartida (id_partida, id_login, puntos_obtenidos)
+       VALUES (?, ?, ?)`,
+      [id_partida, id_login, puntos_obtenidos]
+    );
+
+    res.status(201).json({
+      success: true,
+      message: "Puntos guardados exitosamente",
+    });
+  } catch (error) {
+    console.error("Error al guardar resultado:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error al guardar resultado",
+      error: error.message,
+    });
+  }
+};
+
+exports.obtenerPodio = async (req, res) => {
+  const { id_partida } = req.params;
+
+  try {
+    const [resultados] = await pool.execute(
+      `SELECT L.nombre, R.puntos_obtenidos
+       FROM ResultadosPartida R
+       JOIN Login L ON R.id_login = L.id_login
+       WHERE R.id_partida = ?
+       ORDER BY R.puntos_obtenidos DESC
+       LIMIT 5`,
+      [id_partida]
+    );
+
+    res.json({
+      success: true,
+      podio: resultados,
+    });
+  } catch (error) {
+    console.error("Error al obtener podio:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error al obtener podio",
+    });
+  }
+};
