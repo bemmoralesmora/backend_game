@@ -143,11 +143,12 @@ exports.obtenerPodio = async (req, res) => {
 
   try {
     const [resultados] = await pool.execute(
-      `SELECT L.nombre, R.puntos_obtenidos
+      `SELECT L.nombre, MAX(R.puntos_obtenidos) AS puntos_obtenidos
        FROM ResultadosPartida R
        JOIN Login L ON R.id_login = L.id_login
        WHERE R.id_partida = ?
-       ORDER BY R.puntos_obtenidos DESC`,
+       GROUP BY R.id_login
+       ORDER BY puntos_obtenidos DESC`,
       [id_partida]
     );
 
