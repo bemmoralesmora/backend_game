@@ -147,8 +147,7 @@ exports.obtenerPodio = async (req, res) => {
        FROM ResultadosPartida R
        JOIN Login L ON R.id_login = L.id_login
        WHERE R.id_partida = ?
-       ORDER BY R.puntos_obtenidos DESC
-       LIMIT 5`,
+       ORDER BY R.puntos_obtenidos DESC`,
       [id_partida]
     );
 
